@@ -82,12 +82,30 @@ library(tidyverse)
 data <- px_data_frame %>% as_tibble()
 data <- data %>% rename(Alue = `Alue 2020`, Luvut = `Kuntien avainluvut`)
 data <- data %>% pivot_wider(id_cols = c(Alue, Vuosi), names_from = Tiedot, values_from = Luvut)
+data %>% head()
 data %>% glimpse()
-data %>% group_by(Alue)
 
-# 20 biggest municipalities in 2019 based on population
-greatest20.names <- data %>% filter(Vuosi == 2019 & !grepl('maakunta|seutukunta', Alue)) %>% tail(-1) %>% arrange(desc(Väkiluku)) %>% head(20) %>% select(Alue)
-greatest20.data <- data %>% filter(Alue %in% greatest20$Alue) %>% drop_na() %>% arrange(Vuosi)
+muni <- data %>% filter(!grepl('koko maa|maakunta|seutukunta', Alue, ignore.case = T))
 
-test <- greatest20.data %>% filter(Alue == 'Espoo') %>% select(Väkiluku)
-plot(test$Väkiluku)
+# Latest available data
+muni.latest <- municipalities %>% 
+  group_by(Alue) %>% 
+  drop_na() %>% 
+  slice(which.max(Vuosi)) %>%
+  select(-Vuosi) %>% 
+  arrange(desc(Väkiluku))
+  
+# 20 biggest municipalities 
+g20.names <- muni.latest %>% head(20) %>% select(Alue)
+g20.data <- muni.latest %>% filter(Alue %in% greatest20.names$Alue)
+
+g20.data.pca <- g20.data %>% column_to_rownames(var = 'Alue')
+g20.pca <- prcomp(g20.data.pca, scale. = T)
+g20.pca$sdev^2/sum(g20.pca$sdev^2)*100 %>% round(digits = 2)
+g20.pca$rotation[,1] %>% sort()
+
+# All municipalities
+muni.latest.pca <- muni.latest %>% column_to_rownames(var = "Alue")
+muni.pca <- prcomp(muni.latest.pca, scale. = T)
+muni.pca$sdev^2/sum(muni.pca$sdev^2)*100
+muni.pca$rotation[,1] %>% sort()
