@@ -2,13 +2,38 @@
 title: "MSA Project"
 author: "Niko Miller"
 date: "`r format(Sys.time(), '%d.%m.%Y')`"
+
 output: pdf_document
+
+bibliography: references.bib
+
+header-includes:
+- \pagenumbering{gobble}
+  
 ---
 
 ```{r setup, include=FALSE}
+
 knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+
 ```
+
+\tableofcontents
+
+\newpage
+\pagenumbering{arabic}
+
+# Data
+
+I used the package PXWEB API [@pxweb] to retrieve a data set on key ratios for all of Finland's municipalities during 1987-2019 according to the 2020 municipality classification [@data].
 
 # Introduction
 
-Lorem Ipsum
+
+
+\pagebreak
+# References
+
+
+
