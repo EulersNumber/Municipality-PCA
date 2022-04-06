@@ -1,3 +1,3 @@
-# msa-project
+# MSA Project
 
-Multivariate Statistical Analysis course project
+Course project in Multivariate Statistical Analysis
