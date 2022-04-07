@@ -23,7 +23,7 @@ header-includes:
 - \usepackage[font={small,it}]{subcaption}
 - \usepackage{hyperref}
 
-subtitle: "Dimensionality reduction with PCA on Finnish municipalities' demographic variables"
+subtitle: "Dimensionality reduction with PCA on Finnish municipality demographics"
 geometry: top=0.7in, bottom=0.5in, left=0.5in, right=0.7in
 ---
 
