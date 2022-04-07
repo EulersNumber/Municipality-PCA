@@ -1,5 +1,5 @@
 ---
-title: "MSA Project"
+title: "PCA on Finnish Municipalities"
 author: "Niko Miller"
 date: "`r format(Sys.time(), '%d.%m.%Y')`"
 output: 
@@ -23,7 +23,7 @@ header-includes:
 - \usepackage[font={small,it}]{subcaption}
 - \usepackage{hyperref}
 
-subtitle: "Course project in Multivariate Statistical Analysis"
+subtitle: "Dimensionality reduction with PCA on Finnish municipalities' demographic variables"
 geometry: top=0.7in, bottom=0.5in, left=0.5in, right=0.7in
 ---
 
@@ -39,15 +39,35 @@ library(tidyverse)
 \newpage
 \pagenumbering{arabic}
 
-# Data
-
-I used the package PXWEB API [@pxweb] to retrieve a data set on key ratios for all of Finland's municipalities during 1987-2019 according to the 2020 municipality classification [@data].
 
 # Introduction
 
+## Motivation
+
+Tilastokeskus provides data on 32 demographic variables of Finnish municipalities [@data]. Those variables are in many cases correlated and some are perhaps better in explaining differences between municipalities. Hence, an interesting question is whether we could reduce dimensionality of the data and describe municipalities using only a few variables.
+
+## Objective and research question
+
+## Scope
+
+# Data and Exploratory Analysis
+
+I used PXWEB API [@pxweb] to retrieve a data set on key ratios for all of Finland's municipalities during 1987-2019 according to the 2020 municipality classification. The data set is provided by Tilastokeskus [@data].
+
+## Cleaning and Manipulation
+
+## Univariate Analysis
+
+## Bivariate Analysis
+
+# Principal Component Analysis (PCA)
+
+## Principal Components 1 and 2
+
+# Discussion and Conclusions
 
 
-\pagebreak
+\newpage
 # References
 
 
