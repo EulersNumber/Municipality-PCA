@@ -82,30 +82,79 @@ library(tidyverse)
 data <- px_data_frame %>% as_tibble()
 data <- data %>% rename(Alue = `Alue 2020`, Luvut = `Kuntien avainluvut`)
 data <- data %>% pivot_wider(id_cols = c(Alue, Vuosi), names_from = Tiedot, values_from = Luvut)
-data %>% head()
-data %>% glimpse()
+data.mod <- data %>% 
+  rename(Area = Alue,
+         Year = Vuosi,
+         Prop.Urban.Areas = `Taajama-aste, %`,
+         Pop = Väkiluku,
+         Pop.Change = `Väkiluvun muutos edellisestä vuodesta, %`,
+         Prop.Below15 = `Alle 15-vuotiaiden osuus väestöstä, %`,
+         Prop.15to64 = `15-64 -vuotiaiden osuus väestöstä, %`,
+         Prop.Over64 = `Yli 64-vuotiaiden osuus väestöstä, %`,
+         Prop.Swedish = `Ruotsinkielisten osuus väestöstä, %`,
+         Prop.Foreign = `Ulkomaan kansalaisten osuus väestöstä, %`,
+         Pop.Growth = `Syntyneiden enemmyys, henkilöä`,
+         Migr.Gain = `Kuntien välinen muuttovoitto/-tappio, henkilöä`,
+         Families = `Perheiden lukumäärä`,
+         Households = `Asuntokuntien lukumäärä`,
+         Prop.Households.rowSmall = `Rivi- ja pientaloissa asuvien asuntokuntien osuus, %`,
+         Prop.Households.Rent = `Vuokra-asunnoissa asuvien asuntokuntien osuus, %`,
+         Prop.Educ.Degree2 = `Vähintään toisen asteen tutkinnon suorittaneiden osuus 15 vuotta täyttäneistä, %`,
+         Prop.Educ.High = `Korkea-asteen tutkinnon suorittaneiden osuus 15 vuotta täyttäneistä, %`,
+         Employed = `Alueella asuvan työllisen työvoiman määrä`,
+         Empl.Rate = `Työllisyysaste, %`,
+         Prop.Households.Empl = `Asuinkunnassaan työssäkäyvien osuus, %`,
+         Prop.Unempl = `Työttömien osuus työvoimasta, %`,
+         Prop.Pension = `Eläkeläisten osuus väestöstä, %`,
+         Support.Ratio = `Taloudellinen huoltosuhde`,
+         Jobs = `Alueella olevien työpaikkojen lukumäärä`,
+         Prop.Primary.Sector = `Alkutuotannon työpaikkojen osuus, %`,
+         Prop.Secondary.Sector = `Jalostuksen työpaikkojen osuus, %`,
+         Prop.Services.Sector = `Palvelujen työpaikkojen osuus, %`,
+         Jobs.Self.Suff = Työpaikkaomavaraisuus,
+         Margin.Citizen = `Vuosikate, euroa/asukas`,
+         Loan.Citizen = `Lainakanta, euroa/asukas`,
+         Concern.Loan.Citizen = `Konsernin lainakanta, euroa/asukas`,
+         Educ.Cult.Citizen = `Opetus- ja kulttuuritoiminta yhteensä, nettokäyttökustannukset, euroa/asukas`,
+         Soc.Health.Citizen = `Sosiaali- ja terveystoiminta yhteensä, nettokäyttökustannukset, euroa/asukas`
+         )
 
-muni <- data %>% filter(!grepl('koko maa|maakunta|seutukunta', Alue, ignore.case = T))
+data.mod %>% head()
+data.mod %>% glimpse()
+
+muni <- data.mod %>% filter(!grepl('koko maa|maakunta|seutukunta', Area, ignore.case = T))
 
 # Latest available data
-muni.latest <- municipalities %>% 
-  group_by(Alue) %>% 
+muni.latest <- muni %>% 
+  group_by(Area) %>% 
   drop_na() %>% 
-  slice(which.max(Vuosi)) %>%
-  select(-Vuosi) %>% 
-  arrange(desc(Väkiluku))
+  slice(which.max(Year)) %>%
+  select(-Year) %>% 
+  arrange(desc(Pop))
   
 # 20 biggest municipalities 
-g20.names <- muni.latest %>% head(20) %>% select(Alue)
-g20.data <- muni.latest %>% filter(Alue %in% greatest20.names$Alue)
+g20.names <- muni.latest %>% head(20) %>% select(Area)
+g20.data <- muni.latest %>% filter(Area %in% greatest20.names$Area)
 
-g20.data.pca <- g20.data %>% column_to_rownames(var = 'Alue')
+g20.data.pca <- g20.data %>% column_to_rownames(var = 'Area')
 g20.pca <- prcomp(g20.data.pca, scale. = T)
 g20.pca$sdev^2/sum(g20.pca$sdev^2)*100 %>% round(digits = 2)
 g20.pca$rotation[,1] %>% sort()
 
+# Random 20 municipalities
+set.seed(0)
+r20.data <- muni.latest[sample.int(n = nrow(muni.latest), size = 20) ,] 
+r20.data.pca <- r20.data %>% column_to_rownames(var = 'Area')
+r20.pca <- prcomp(r20.data.pca, scale. = T)
+
+summary(r20.pca)
+biplot(r20.pca, scale = 0)
+
 # All municipalities
-muni.latest.pca <- muni.latest %>% column_to_rownames(var = "Alue")
+muni.latest.pca <- muni.latest %>% column_to_rownames(var = "Area")
 muni.pca <- prcomp(muni.latest.pca, scale. = T)
 muni.pca$sdev^2/sum(muni.pca$sdev^2)*100
 muni.pca$rotation[,1] %>% sort()
+
+summary(muni.pca)
+biplot(muni.pca, scale = 0)
