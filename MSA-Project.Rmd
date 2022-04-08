@@ -31,6 +31,7 @@ geometry: top=0.7in, bottom=0.5in, left=0.5in, right=0.7in
 
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
+library(knitr)
 
 ```
 
@@ -55,6 +56,20 @@ Tilastokeskus provides data on 32 demographic variables of Finnish municipalitie
 I used PXWEB API [@pxweb] to retrieve a data set on key ratios for all of Finland's municipalities during 1987-2019 according to the 2020 municipality classification. The data set is provided by Tilastokeskus [@data].
 
 ## Cleaning and Manipulation
+
+## Variables and descriptive statistics
+
+```{r}
+
+vars <-  c('Prop.Urban.Areas', 'Pop', 'Pop.Change', 'Prop.Below15', 'Prop.15to64', 'Prop.Over64', 'Prop.Swedish', 'Prop.Foreign', 'Pop.Growth', 'Migr.Gain', 'Families', 'Households', 'Prop.Households.rowSmall', 'Prop.Households.Rent', 'Prop.Educ.Degree2', 'Prop.Educ.High', 'Employed', 'Empl.Rate', 'Prop.Households.Empl', 'Prop.Unempl', 'Prop.Pension', 'Support.Ratio', 'Jobs', 'Prop.Primary.Sector', 'Prop.Secondary.Sector', 'Prop.Services.Sector', 'Jobs.Self.Suff', 'Margin.Citizen', 'Loan.Citizen', 'Concern.Loan.Citizen', 'Educ.Cult.Citizen', 'Soc.Health.Citizen')
+explanations <- rep("NA", length(vars))
+var.df <- data.frame(vars, explanations)
+
+knitr::kable(var.df, col.names = c("Variable", "Explanation"))
+
+```
+
+
 
 ## Univariate Analysis
 
