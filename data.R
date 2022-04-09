@@ -131,7 +131,9 @@ muni.latest <- muni %>%
   slice(which.max(Year)) %>%
   select(-Year) %>% 
   arrange(desc(Pop))
-  
+
+write.csv(muni.latest, file = "muni.csv")
+
 # 20 biggest municipalities 
 g20.names <- muni.latest %>% head(20) %>% select(Area)
 g20.data <- muni.latest %>% filter(Area %in% greatest20.names$Area)
