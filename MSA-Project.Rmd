@@ -8,7 +8,7 @@ output:
     number_sections: true
     fig_caption: true
     citation_package: natbib
-    extra_dependencies: ["float"]
+    # extra_dependencies: ["float"]
 bibliography: references.bib
 header-includes:
 - \pagenumbering{gobble}
@@ -18,7 +18,8 @@ header-includes:
 - \usepackage{mathtools}
 - \usepackage{graphicx}
 - \usepackage{placeins}
-- \usepackage{wrapfig}
+- \usepackage{float}
+- \floatplacement{figure}{H}
 - \usepackage{framed}
 - \usepackage[font={small,it}]{caption}
 - \usepackage[font={small,it}]{subcaption}
@@ -39,6 +40,8 @@ library(knitr)
 library(kableExtra)
 library(summarytools)
 library(pxweb)
+library(ggplot2)
+library(reshape2)
 
 ```
 
@@ -69,9 +72,7 @@ muni.latest <- muni.latest[, -1] %>% as_tibble()
 
 ```
 
-
 ## Variable Descriptions
-
 
 ```{r, echo=FALSE}
 
@@ -89,7 +90,9 @@ kable(var.df, format = "latex", align = "lll", col.names = c("Original", "Modifi
 
 ```
 
-## Descriptive Statistics
+## Univariate Analysis
+
+### Descriptive Statistics
 
 ```{r, echo=FALSE}
 stats <- muni.latest[, -1] %>% apply(2, summary) %>% t() %>% as.data.frame()
@@ -104,11 +107,74 @@ kable(stats.df, format = "latex", align = "lrrrrrr", caption = "Descriptive Stat
 
 ```
 
-## Univariate Analysis
+
+### Distribution Plots
+
+```{r, include=FALSE}
+
+ages <- muni.latest %>% 
+  select(Prop.Below15, Prop.15to64, Prop.Over64)
+ages <- melt(ages)
+
+living <- muni.latest %>% 
+  select(Prop.Households.rowSmall, Prop.Households.Rent)
+living <- melt(living)
+
+employment <- muni.latest %>% 
+  select(Empl.Rate, Prop.Unempl, Prop.Pension)
+employment <- melt(employment)
+
+sectors <- muni.latest %>% 
+  select(Prop.Primary.Sector, Prop.Secondary.Sector, Prop.Services.Sector)
+sectors <- melt(sectors)
+
+```
 
 
+```{r, echo=FALSE, fig.cap='Probability density estimates for age groups', position, out.width='80%'}
+
+ggplot(ages, aes(x=value, fill=variable)) + geom_density(alpha = .25, adjust = .75) + theme_bw() +
+  scale_fill_manual( values = c("#dde318","#3dbc74","#440154")) +
+  labs(x = "Percentage (%) of Population", y = "Density", fill = "Variable", title = "Age Groups") +
+  theme(legend.position = "right", legend.text = element_text(size = 9))
+
+```
+
+
+```{r, echo=FALSE, fig.cap='Probability density estimates for living types', out.width='80%'}
+
+ggplot(living, aes(x=value, fill=variable)) + geom_density(alpha = .25, adjust = .75) + theme_bw() +
+  scale_fill_manual( values = c("#dde318","#3dbc74","#440154")) +
+  labs(x = "Percentage (%) of Population", y = "Density", fill = "Variable", title = "Living Types") +
+  theme(legend.position = "right", legend.text = element_text(size = 9))
+
+```
+
+
+```{r, echo=FALSE, fig.cap='Probability density estimates for Employment Groups', out.width='80%'}
+
+ggplot(employment, aes(x=value, fill=variable)) + geom_density(alpha = .25, adjust = .75) + theme_bw() +
+  scale_fill_manual( values = c("#dde318","#3dbc74","#440154")) +
+  labs(x = "Percentage (%) of Population", y = "Density", fill = "Variable", title = "Employment Groups") +
+  theme(legend.position = "right", legend.text = element_text(size = 9))
+
+```
+
+
+```{r, echo=FALSE, fig.cap='Probability density estimates for Economic Sectors', out.width='80%'}
+
+ggplot(living, aes(x=value, fill=variable)) + geom_density(alpha = .25, adjust = .75) + theme_bw() +
+  scale_fill_manual( values = c("#dde318","#3dbc74","#440154")) +
+  labs(x = "Percentage (%) of Population", y = "Density", fill = "Variable", title = "Economic Sectors") +
+  theme(legend.position = "right", legend.text = element_text(size = 9))
+
+```
 
 ## Bivariate Analysis
+
+### Pearson's Correlation
+
+- Correlation heatmap here
 
 # Principal Component Analysis (PCA)
 
