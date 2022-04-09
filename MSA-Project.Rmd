@@ -35,6 +35,7 @@ geometry: top=0.7in, bottom=0.5in, left=0.5in, right=0.7in
 ```{r setup, include=FALSE}
 
 knitr::opts_chunk$set(echo = TRUE)
+knitr::knit_hooks$set(optipng = knitr::hook_optipng)
 library(tidyverse)
 library(knitr)
 library(kableExtra)
@@ -42,14 +43,19 @@ library(summarytools)
 library(pxweb)
 library(ggplot2)
 library(reshape2)
+library(ggcorrplot)
 
 ```
 
+<!-- \vspace{-1cm} -->
+
 \tableofcontents
+
+<!-- \listoftables -->
+<!-- \listoffigures -->
 
 \newpage
 \pagenumbering{arabic}
-
 
 # Introduction
 
@@ -133,7 +139,7 @@ sectors <- melt(sectors)
 
 ```{r, echo=FALSE, fig.cap='Probability density estimates for age groups', position, out.width='80%'}
 
-ggplot(ages, aes(x=value, fill=variable)) + geom_density(alpha = .25, adjust = .75) + theme_bw() +
+ggplot(ages, aes(x=value, fill=variable)) + geom_density(alpha = .25, adjust = .75) + theme_minimal() +
   scale_fill_manual( values = c("#dde318","#3dbc74","#440154")) +
   labs(x = "Percentage (%) of Population", y = "Density", fill = "Variable", title = "Age Groups") +
   theme(legend.position = "right", legend.text = element_text(size = 9))
@@ -143,7 +149,7 @@ ggplot(ages, aes(x=value, fill=variable)) + geom_density(alpha = .25, adjust = .
 
 ```{r, echo=FALSE, fig.cap='Probability density estimates for living types', out.width='80%'}
 
-ggplot(living, aes(x=value, fill=variable)) + geom_density(alpha = .25, adjust = .75) + theme_bw() +
+ggplot(living, aes(x=value, fill=variable)) + geom_density(alpha = .25, adjust = .75) + theme_minimal() +
   scale_fill_manual( values = c("#dde318","#3dbc74","#440154")) +
   labs(x = "Percentage (%) of Population", y = "Density", fill = "Variable", title = "Living Types") +
   theme(legend.position = "right", legend.text = element_text(size = 9))
@@ -151,9 +157,9 @@ ggplot(living, aes(x=value, fill=variable)) + geom_density(alpha = .25, adjust =
 ```
 
 
-```{r, echo=FALSE, fig.cap='Probability density estimates for Employment Groups', out.width='80%'}
+```{r, echo=FALSE, fig.cap='Probability density estimates for employment groups', out.width='80%'}
 
-ggplot(employment, aes(x=value, fill=variable)) + geom_density(alpha = .25, adjust = .75) + theme_bw() +
+ggplot(employment, aes(x=value, fill=variable)) + geom_density(alpha = .25, adjust = .75) + theme_minimal() +
   scale_fill_manual( values = c("#dde318","#3dbc74","#440154")) +
   labs(x = "Percentage (%) of Population", y = "Density", fill = "Variable", title = "Employment Groups") +
   theme(legend.position = "right", legend.text = element_text(size = 9))
@@ -161,9 +167,9 @@ ggplot(employment, aes(x=value, fill=variable)) + geom_density(alpha = .25, adju
 ```
 
 
-```{r, echo=FALSE, fig.cap='Probability density estimates for Economic Sectors', out.width='80%'}
+```{r, echo=FALSE, fig.cap='Probability density estimates for economic sectors', out.width='80%'}
 
-ggplot(living, aes(x=value, fill=variable)) + geom_density(alpha = .25, adjust = .75) + theme_bw() +
+ggplot(living, aes(x=value, fill=variable)) + geom_density(alpha = .25, adjust = .75) + theme_minimal() +
   scale_fill_manual( values = c("#dde318","#3dbc74","#440154")) +
   labs(x = "Percentage (%) of Population", y = "Density", fill = "Variable", title = "Economic Sectors") +
   theme(legend.position = "right", legend.text = element_text(size = 9))
@@ -174,11 +180,47 @@ ggplot(living, aes(x=value, fill=variable)) + geom_density(alpha = .25, adjust =
 
 ### Pearson's Correlation
 
-- Correlation heatmap here
+```{r, echo=FALSE, fig.dim=c(18,18), fig.cap="Heatmap of Pearson'n correlation between all variables", optipng = '-o7'}
+corr <- cor(muni.latest[, -1])
+ggcorrplot(corr, hc.order = TRUE, type = "full", lab = TRUE, title = "Heatmap of Correlations", lab_size = 3.5)
+
+```
 
 # Principal Component Analysis (PCA)
 
+## Scree Plot
+
+```{r, echo=FALSE, fig.cap="Variance explained by each Princial Component (PC) up to the 20th PC. This type of a plot is also known as a Scree Plot", optipng = '-o7'}
+
+muni.latest.pca <- muni.latest %>% column_to_rownames(var = "Area")
+muni.pca <- prcomp(muni.latest.pca, scale. = T)
+
+muni.pca.summary <- summary(muni.pca)
+scree.df <- muni.pca.summary$importance[, 1:20] %>% t() %>% as.data.frame()
+scree.df$PC <- 1:20
+scree.df$Included <- c(rep("Yes",4), rep("No",16))
+scree.df <- scree.df[, c(4,2,3,5)]
+rownames(scree.df) <- NULL
+colnames(scree.df) <- c("PC", "Prop.var", "Cum.prop", "Included")
+
+ggplot(scree.df) +
+  geom_bar(aes(x = PC, y = Prop.var, fill = Included), stat = "identity") +
+  scale_fill_manual(values = c("#440154", "#3dbc74")) +
+  geom_line(aes(x = PC, y = Cum.prop)) +
+  geom_point(aes(x = PC, y = Cum.prop)) +
+  geom_hline(yintercept = 0.75, linetype = 2) +
+  annotate("text", x=10.5, y=0.78, label= "75% of variance explained", size = 3) +
+  labs(x = "Principal Component", y = "Variance Explained (%)", title = "PCA Scree Plot") +
+  guides(fill = guide_legend(reverse = TRUE)) +
+  theme_minimal()
+
+```
+
+## Biplot
+
 ## Principal Components 1 and 2
+
+## Principal Components 3 and 4
 
 # Discussion and Conclusions
 
