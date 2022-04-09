@@ -190,7 +190,6 @@ ggcorrplot(corr, hc.order = TRUE, type = "full", lab = TRUE, title = "Heatmap of
 
 ## Scree Plot
 
-<<<<<<< HEAD
 ```{r, echo=FALSE, fig.cap="Variance explained by each Princial Component (PC) up to the 20th PC. This type of a plot is also known as a Scree Plot", optipng = '-o7'}
 
 muni.latest.pca <- muni.latest %>% column_to_rownames(var = "Area")
