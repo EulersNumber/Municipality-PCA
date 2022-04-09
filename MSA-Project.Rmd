@@ -8,6 +8,7 @@ output:
     number_sections: true
     fig_caption: true
     citation_package: natbib
+    extra_dependencies: ["float"]
 bibliography: references.bib
 header-includes:
 - \pagenumbering{gobble}
@@ -22,6 +23,9 @@ header-includes:
 - \usepackage[font={small,it}]{caption}
 - \usepackage[font={small,it}]{subcaption}
 - \usepackage{hyperref}
+- \usepackage[labelsep=period]{caption}
+- \usepackage[labelfont=bf]{caption}
+- \captionsetup{justification=raggedright,singlelinecheck=false}
 
 subtitle: "Dimensionality reduction with PCA on Finnish municipality demographics"
 geometry: top=0.7in, bottom=0.5in, left=0.5in, right=0.7in
@@ -32,6 +36,9 @@ geometry: top=0.7in, bottom=0.5in, left=0.5in, right=0.7in
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(knitr)
+library(kableExtra)
+library(summarytools)
+library(pxweb)
 
 ```
 
@@ -55,23 +62,51 @@ Tilastokeskus provides data on 32 demographic variables of Finnish municipalitie
 
 I used PXWEB API [@pxweb] to retrieve a data set on key ratios for all of Finland's municipalities during 1987-2019 according to the 2020 municipality classification. The data set is provided by Tilastokeskus [@data].
 
-## Cleaning and Manipulation
+```{r, include=FALSE}
 
-## Variables and descriptive statistics
-
-```{r}
-
-vars <-  c('Prop.Urban.Areas', 'Pop', 'Pop.Change', 'Prop.Below15', 'Prop.15to64', 'Prop.Over64', 'Prop.Swedish', 'Prop.Foreign', 'Pop.Growth', 'Migr.Gain', 'Families', 'Households', 'Prop.Households.rowSmall', 'Prop.Households.Rent', 'Prop.Educ.Degree2', 'Prop.Educ.High', 'Employed', 'Empl.Rate', 'Prop.Households.Empl', 'Prop.Unempl', 'Prop.Pension', 'Support.Ratio', 'Jobs', 'Prop.Primary.Sector', 'Prop.Secondary.Sector', 'Prop.Services.Sector', 'Jobs.Self.Suff', 'Margin.Citizen', 'Loan.Citizen', 'Concern.Loan.Citizen', 'Educ.Cult.Citizen', 'Soc.Health.Citizen')
-explanations <- rep("NA", length(vars))
-var.df <- data.frame(vars, explanations)
-
-knitr::kable(var.df, col.names = c("Variable", "Explanation"))
+muni.latest <- read.csv("muni.csv")
+muni.latest <- muni.latest[, -1] %>% as_tibble()
 
 ```
 
 
+## Variable Descriptions
+
+
+```{r, echo=FALSE}
+
+vars.orig <- c('Taajama-aste, %', 'Väkiluku', 'Väkiluvun muutos edellisestä vuodesta, %', 'Alle 15-vuotiaiden osuus väestöstä, %', '15-64 -vuotiaiden osuus väestöstä, %', 'Yli 64-vuotiaiden osuus väestöstä, %', 'Ruotsinkielisten osuus väestöstä, %', 'Ulkomaan kansalaisten osuus väestöstä, %', 'Syntyneiden enemmyys, henkilöä', 'Kuntien välinen muuttovoitto/-tappio, henkilöä', 'Perheiden lukumäärä', 'Asuntokuntien lukumäärä', 'Rivi- ja pientaloissa asuvien asuntokuntien osuus, %', 'Vuokra-asunnoissa asuvien asuntokuntien osuus, %', 'Vähintään toisen asteen tutkinnon suorittaneiden osuus 15 vuotta täyttäneistä, %', 'Korkea-asteen tutkinnon suorittaneiden osuus 15 vuotta täyttäneistä, %', 'Alueella asuvan työllisen työvoiman määrä', 'Työllisyysaste, %', 'Asuinkunnassaan työssäkäyvien osuus, %', 'Työttömien osuus työvoimasta, %', 'Eläkeläisten osuus väestöstä, %', 'Taloudellinen huoltosuhde', 'Alueella olevien työpaikkojen lukumäärä', 'Alkutuotannon työpaikkojen osuus, %', 'Jalostuksen työpaikkojen osuus, %', 'Palvelujen työpaikkojen osuus, %', 'Työpaikkaomavaraisuus', 'Vuosikate, euroa/asukas', 'Lainakanta, euroa/asukas', 'Konsernin lainakanta, euroa/asukas', 'Opetus- ja kulttuuritoiminta yhteensä, nettokäyttökustannukset, euroa/asukas', 'Sosiaali- ja terveystoiminta yhteensä, nettokäyttökustannukset, euroa/asukas')
+               
+vars <-  c('Prop.Urban.Areas', 'Pop', 'Pop.Change', 'Prop.Below15', 'Prop.15to64', 'Prop.Over64', 'Prop.Swedish', 'Prop.Foreign', 'Pop.Growth', 'Migr.Gain', 'Families', 'Households', 'Prop.Households.rowSmall', 'Prop.Households.Rent', 'Prop.Educ.Degree2', 'Prop.Educ.High', 'Employed', 'Empl.Rate', 'Prop.Households.Empl', 'Prop.Unempl', 'Prop.Pension', 'Support.Ratio', 'Jobs', 'Prop.Primary.Sector', 'Prop.Secondary.Sector', 'Prop.Services.Sector', 'Jobs.Self.Suff', 'Margin.Citizen', 'Loan.Citizen', 'Concern.Loan.Citizen', 'Educ.Cult.Citizen', 'Soc.Health.Citizen')
+
+explanations <- rep("NA", length(vars))
+
+var.df <- data.frame(vars.orig, vars, explanations)
+
+kable(var.df, format = "latex", align = "lll", col.names = c("Original", "Modified", "Explanation"), caption = "Variable Descriptions") %>%
+  row_spec(0, bold = T) %>% 
+  kable_styling(latex_options = c("HOLD_position", "scale_down"), position = "left")
+
+```
+
+## Descriptive Statistics
+
+```{r, echo=FALSE}
+stats <- muni.latest[, -1] %>% apply(2, summary) %>% t() %>% as.data.frame()
+stats$Std <- muni.latest[, -1] %>% apply(2, sd)
+
+stats.df <- data.frame(vars, stats)
+rownames(stats.df) <- NULL
+
+kable(stats.df, format = "latex", align = "lrrrrrr", caption = "Descriptive Statistics", digits = 1, col.names = c("Var", "Min", "1st Qu.", "Median", "Mean", "3rd Qu.", "Max", "Std.")) %>% 
+  row_spec(0, bold = T) %>% 
+  kable_styling(latex_options = "HOLD_position", position = "left")
+
+```
 
 ## Univariate Analysis
+
+
 
 ## Bivariate Analysis
 
