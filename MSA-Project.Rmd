@@ -373,7 +373,7 @@ To assess how much proportion of variance can be explained with the first few PC
 
 ## Scree Plot
 
-```{r screeplot, echo=FALSE, fig.cap="Variance explained by each Princial Component (PC) up to the 20th PC. This type of a plot is also known as a Scree Plot", optipng = '-o7'}
+```{r screeplot, echo=FALSE, fig.cap="Variance explained by each Princial Component (PC) up to the 20th PC. This type of a plot is also known as a Scree Plot", fig.align='left', optipng = '-o7'}
 
 muni.latest.pca <- muni.latest %>% column_to_rownames(var = "Area")
 muni.pca <- prcomp(muni.latest.pca, center = T, scale. = T)
@@ -408,7 +408,7 @@ Figure \@ref(fig:loadingsplot1) shows the loading directions for PCs 1 and 2.
 Figure \@ref(fig:scoreplot2) shows the scores for PCs 3 and 4.
 
 Figure \@ref(fig:loadingsplot2) shows the loading directions for PCs 3 and 4.
-```{r scoreplot1, echo=FALSE, message=FALSE, fig.cap="Score plot for all municipalities that have a top 5 absolute loading in any of PC1 and PC2", fig.align='center'}
+```{r scoreplot1, echo=FALSE, message=FALSE, fig.cap="Score plot for all municipalities that have a top 5 absolute loading in any of PC1 and PC2", fig.align='left', optipng = '-o7'}
 
 loads <- muni.pca$x[, 1:2] %>% as.data.frame() %>% rownames_to_column() %>% as_tibble() %>% dplyr::rename(Area = rowname)
 
@@ -441,7 +441,7 @@ ggplot(loads.reduced, aes(x = PC1, y = PC2, label = Area)) +
 ```
 
 
-```{r loadingsplot1, warning=FALSE, echo=FALSE, fig.cap="Loading directions for PC1 and PC2", fig.align='center'}
+```{r loadingsplot1, warning=FALSE, echo=FALSE, fig.cap="Loading directions for PC1 and PC2", fig.align='left', optipng = '-o7'}
 
 ggplot2::autoplot(muni.pca, 
                   alpha = 0,
@@ -462,7 +462,7 @@ ggplot2::autoplot(muni.pca,
 
 ## Principal Components 3 and 4
 
-```{r scoreplot2, echo=FALSE, message=FALSE, fig.cap="Score plot for all municipalities that have a top 5 absolute loading in any of PC3 and PC4", fig.align='center'}
+```{r scoreplot2, echo=FALSE, message=FALSE, fig.cap="Score plot for all municipalities that have a top 5 absolute loading in any of PC3 and PC4", fig.align='left', optipng = '-o7'}
 
 loads <- muni.pca$x[, 3:4] %>% as.data.frame() %>% rownames_to_column() %>% as_tibble() %>% dplyr::rename(Area = rowname)
 
@@ -495,7 +495,7 @@ ggplot(loads.reduced, aes(x = PC3, y = PC4, label = Area)) +
 ```
 
 
-```{r loadingsplot2, warning=FALSE, echo=FALSE, fig.cap="Loading directions for PC3 and PC4", fig.align='center'}
+```{r loadingsplot2, warning=FALSE, echo=FALSE, fig.cap="Loading directions for PC3 and PC4", fig.align='left', optipng = '-o7'}
 
 ggplot2::autoplot(muni.pca,
                   x = 3,
