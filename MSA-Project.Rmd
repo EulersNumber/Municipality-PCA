@@ -8,7 +8,6 @@ output:
     number_sections: true
     fig_caption: true
     citation_package: natbib
-    # extra_dependencies: ["float"]
 bibliography: references.bib
 header-includes:
 - \pagenumbering{gobble}
@@ -37,6 +36,7 @@ geometry: top=0.7in, bottom=0.5in, left=0.5in, right=0.7in
 knitr::opts_chunk$set(echo = TRUE)
 knitr::knit_hooks$set(optipng = knitr::hook_optipng)
 options(ggrepel.max.overlaps = Inf)
+
 library(tidyverse)
 library(knitr)
 library(kableExtra)
@@ -47,6 +47,17 @@ library(reshape2)
 library(ggcorrplot)
 library(ggrepel)
 library(ggfortify)
+
+# muni.latest <- read.csv("muni.csv")
+# muni.latest <- muni.latest[, -1] %>% as_tibble()
+
+muni.latest <- read.csv("muni_2021.csv", sep = ";" , header = F)
+colnames(muni.latest) <- c('Area', 'Prop.Urban.Areas', 'Pop', 'Pop.Change', 'Prop.Below15', 'Prop.15to64', 'Prop.Over64', 'Prop.Swedish', 'Prop.Foreign', 'Pop.Growth', 'Migr.Gain', 'Families', 'Households', 'Prop.Households.rowSmall', 'Prop.Households.Rent', 'Prop.Educ.Degree2', 'Prop.Educ.High', 'Employed', 'Empl.Rate', 'Prop.Households.Empl', 'Prop.Unempl', 'Prop.Pension', 'Support.Ratio', 'Jobs', 'Prop.Primary.Sector', 'Prop.Secondary.Sector', 'Prop.Services.Sector', 'Jobs.Self.Suff', 'Margin.Citizen', 'Loan.Citizen', 'Concern.Loan.Citizen', 'Educ.Cult.Citizen', 'Soc.Health.Citizen')
+
+muni.latest <- muni.latest %>% filter(!grepl('koko maa|maakunta|seutukunta|mariehamn', Area, ignore.case = T))
+
+muni.latest <- muni.latest %>% 
+  arrange(desc(Pop))
 
 ```
 
@@ -62,24 +73,17 @@ library(ggfortify)
 
 # Introduction
 
-## Motivation
+## Data and Research Questions
 
-Tilastokeskus provides data on 32 demographic variables of Finnish municipalities [@data]. Those variables are in many cases correlated and some are perhaps better in explaining differences between municipalities. Hence, an interesting question is whether we could reduce dimensionality of the data and describe municipalities using only a few variables.
+Tilastokeskus provides data on 32 demographic variables of Finnish municipalities. The data can be freely obtained from Tilastokeskus' website in csv. format [@data]. 
 
-## Objective and research question
+The variables provide information on e.g., the municipalities' population and its growth, age structure, economic sector structure, and the split between different housing types.
 
-## Scope
+The purpose of this study is to reduce dimensionality in the data and assess whether differences between the municipalities can be explained by considerably less than 32 dimensions - namely by first few principal components (PCs). This study's contribution can be seen as exploratory data analysis where the municipalities are clustered in a lower dimension. The results can be applied in further work in e.g., more advanced clustering, prediction or economic decision making. 
 
-# Data and Exploratory Analysis
+Clustering municipalities with demographic factors can be useful in a business context, e.g., marketing. Knowing how municipalities differ in demographics can help a company to improve its targeting and e.g., launch different marketing campaigns or product lines in different municipalities.
 
-I used PXWEB API [@pxweb] to retrieve a data set on key ratios for all of Finland's municipalities during 1987-2019 according to the 2020 municipality classification. The data set is provided by Tilastokeskus [@data].
-
-```{r, include=FALSE}
-
-muni.latest <- read.csv("muni.csv")
-muni.latest <- muni.latest[, -1] %>% as_tibble()
-
-```
+# Univariate Analysis
 
 ## Variable Descriptions
 
@@ -99,9 +103,8 @@ kable(var.df, format = "latex", align = "lll", col.names = c("Original", "Modifi
 
 ```
 
-## Univariate Analysis
 
-### Descriptive Statistics
+## Descriptive Statistics
 
 ```{r, echo=FALSE}
 stats <- muni.latest[, -1] %>% apply(2, summary) %>% t() %>% as.data.frame()
@@ -117,7 +120,7 @@ kable(stats.df, format = "latex", align = "lrrrrrr", caption = "Descriptive Stat
 ```
 
 
-### Distribution Plots
+## Distribution Plots
 
 ```{r, include=FALSE}
 
@@ -179,9 +182,9 @@ ggplot(living, aes(x=value, fill=variable)) + geom_density(alpha = .25, adjust =
 
 ```
 
-## Bivariate Analysis
+# Bivariate Analysis
 
-### Pearson's Correlation
+## Linear Dependencies
 
 ```{r, echo=FALSE, fig.dim=c(18,18), fig.cap="Heatmap of Pearson'n correlation between all variables", optipng = '-o7'}
 corr <- cor(muni.latest[, -1])
@@ -246,7 +249,7 @@ loads.reduced <- full_join(greatest5.PC1, smallest5.PC1) %>% full_join(greatest5
 ggplot(loads.reduced, aes(x = PC1, y = PC2, label = Area)) +
   geom_point() +
   geom_text_repel(size = 3) +
-  xlim(c(-30,10)) +
+  xlim(c(-25,10)) +
   ylim(c(-20,15)) +
   theme_minimal() +
   ggtitle("PCA Scores")
@@ -301,8 +304,8 @@ loads.reduced <- full_join(greatest5.PC3, smallest5.PC3) %>% full_join(greatest5
 ggplot(loads.reduced, aes(x = PC3, y = PC4, label = Area)) +
   geom_point() +
   geom_text_repel(size = 3) +
-  xlim(c(-15,10)) +
-  ylim(c(-10,10)) +
+  xlim(c(-5,5)) +
+  ylim(c(-8,8)) +
   theme_minimal() +
   ggtitle("PCA Scores")
 
@@ -334,6 +337,7 @@ ggplot2::autoplot(muni.pca,
 
 - PC1 and PC2 do not explain a high percentage of the variance (above 80%). Hence, PCA might not be so well suited
 - Using population, employed persons and some other absolute measures might have alienated Helsinki from the other cities and biased the analysis a bit. Perhaps leaving out Helsinki would have been a wise choice
+- Highly correlated variables could have been reduced to only one, i.e., remove unnecessary variables
 - Something else?
 
 \newpage
