@@ -314,15 +314,13 @@ sectors <- melt(sectors)
 ```
 
 
-To analyze how variables are distributed, we use Kernel density estimation to estimate the probability densities for several variable groups.
+To analyze how variables are distributed, we use Kernel density estimation to estimate the probability densities for variables in some common groups. 
 
-Figure \@ref(fig:agekde) shows the probability density estimates for age groups. Age groups are shares of population aged below 15, 15 to 64, and over 64. We can see that ... 
+Figure \@ref(fig:agekde) shows the probability density estimates for age groups. Age groups are shares of population aged below 15, 15 to 64, and over 64. We can see that Prop.Over64  has a wide distribution. The median is close to 30% but there are municipalities in both ends of the distribution. The distribution of Prop.Under15 has a lower variance around its mean value of ~15% but the distribution is clearly positively skewed as there are some municipalities with over 30% of below 15 year-old citizens (Liminka; 30.8%).
 
-Figure \@ref(fig:housingkde) shows the probability density estimates for housing types. Housing types are shares of population living in either terraced or detached houses and in rental apartments. The Figure revels that ...
+Figure \@ref(fig:housingkde) shows the probability density estimates for housing types. Housing types are shares of population living in either terraced or detached houses and in rental apartments. The Figure characterizes Finland well - the distribution of Prop.Households.Terr.Det show that there are lots of municipalities where ~9/10 citizens tend to live in terraced or detached houses. However, the distribution is highly negatively skewed so there are some municipalities where very few people live in those types of houses. On the other hand, Prop.Households.Rental is centered around ~20% but highly positively skewed. This means that while in average 1/5 of people live on rent, there are municipalities where more than half are living on rent. Overall, these results support to hypothesis that Finland is a country of many rural municipalities where people tend to live in terraced and detached houses, and a few big municipalities where the proportion of rental housing increases with city size and the degree of urbanization.
 
-Figure \@ref(fig:employmentkde) shows the probability density estimates for employment measures. Employment measures are the employment rate, the proportion of population that are unemployed, and the proportion of population that are pensioners. The distributions show that ...
-
-Figure \@ref(fig:sectorkde) shows the probability density estimates for the weights of economic sectors in the municipalities. Sectors are the primary-, secondary-, and services sectors. We can interpret that ...
+Similar distribution plots for employment measures and economic sectors are shown in the Appendix.
 
 ```{r agekde, echo=FALSE, fig.cap='Probability density estimates for age groups', fig.align='left', out.width='80%', optipng = '-o7'}
 
@@ -339,26 +337,6 @@ ggplot(ages, aes(x=value, fill=variable)) + geom_density(alpha = .25, adjust = .
 ggplot(living, aes(x=value, fill=variable)) + geom_density(alpha = .25, adjust = .75) + theme_light() +
   scale_fill_manual( values = c("#dde318","#3dbc74","#440154")) +
   labs(x = "Percentage (%) of Population", y = "Density", fill = "Variable", title = "Housing Types") +
-  theme(legend.position = "right", legend.text = element_text(size = 9))
-
-```
-
-
-```{r employmentkde, echo=FALSE, fig.cap='Probability density estimates for employment related measures',fig.align='left', out.width='80%', optipng = '-o7'}
-
-ggplot(employment, aes(x=value, fill=variable)) + geom_density(alpha = .25, adjust = .75) + theme_light() +
-  scale_fill_manual( values = c("#dde318","#3dbc74","#440154")) +
-  labs(x = "Percentage (%) of Population", y = "Density", fill = "Variable", title = "Employment Measures") +
-  theme(legend.position = "right", legend.text = element_text(size = 9))
-
-```
-
-
-```{r sectorkde, echo=FALSE, fig.cap='Probability density estimates for economic sectors', fig.align='left', out.width='80%', optipng = '-o7'}
-
-ggplot(sectors, aes(x=value, fill=variable)) + geom_density(alpha = .25, adjust = .75) + theme_light() +
-  scale_fill_manual( values = c("#dde318","#3dbc74","#440154")) +
-  labs(x = "Percentage (%) of Population", y = "Density", fill = "Variable", title = "Economic Sectors") +
   theme(legend.position = "right", legend.text = element_text(size = 9))
 
 ```
@@ -430,7 +408,7 @@ We can see that variables that have the most negative loading for PC1 are Prop.1
 
 Considering the PC2 dimension, we see that most negatively loaded variables are Prop.Households.Rental, Prop.Empl.Muni, Prop.Unempl, and Jobs.Self.Suff while Empl.Rate, Prop.Households.Terr.Det, Prop.Under15, and Prop.Swedish have strongest positive loadings. PC2 is more difficult to interpret but a clear sign is that Swedish speaking municipalities load positively for PC2. Living on a rent and unemployment indicate lower economic prosperity than living in a terraced or detached house or employment. Perhaps a high number of children is also a sign of economic wellbeing, since having children can be expensive these days. Therefore, PC2 could be an index of economic prosperity. Big cities have a lot of smaller aparments for rent and many younger people like students live there, which could explain why these cities score quite low in PC2 dimension in comparison to smaller cities.
 
-```{r scoreplot1, warning=FALSE, echo=FALSE, message=FALSE, fig.cap="Score plot for all municipalities that have a top 5 absolute loading for any of PC1 and PC2", fig.align='left', optipng = '-o7'}
+```{r scoreplot1, warning=FALSE, echo=FALSE, message=FALSE, fig.cap="Score plot for all municipalities that have a top 5 absolute loading for any of PC1 and PC2", fig.align='left', optipng = '-o7', fig.dim=c(6,4)}
 
 loads <- muni.pca$x[, 1:2] %>% as.data.frame() %>% rownames_to_column() %>% as_tibble() %>% dplyr::rename(Area = rowname)
 
@@ -457,13 +435,13 @@ ggplot(loads.reduced, aes(x = PC1, y = PC2, label = Area)) +
   geom_text_repel(size = 3) +
   xlim(c(-25,10)) +
   ylim(c(-20,15)) +
-  ggtitle("PCA Scores, 1st and 2nd PC") +
+  ggtitle("PCA Scores") +
   theme_light()
 
 ```
 
 
-```{r loadingsplot1, warning=FALSE, echo=FALSE, message=FALSE, fig.cap="Loading directions for PC1 and PC2", fig.align='left', optipng = '-o7'}
+```{r loadingsplot1, warning=FALSE, echo=FALSE, message=FALSE, fig.cap="Loading directions for PC1 and PC2", fig.align='left', optipng = '-o7', fig.dim=c(6,4)}
 
 ggplot2::autoplot(muni.pca, 
                   alpha = 0,
@@ -477,7 +455,7 @@ ggplot2::autoplot(muni.pca,
   scale_y_continuous(limits = c(-0.4, 0.4)) +
   labs(x = "Standardized PC1 (33.6% explained var.)",
        y = "Standardized PC1 (20.9% explained var.)",
-       title = "PCA Loadings, 1st and 2nd PC") +
+       title = "PCA Loading Directions") +
   theme_light()
 
 ```
@@ -493,13 +471,40 @@ Limitations of this study can be seen as the following. First, PC1 and PC2 do no
 \newpage
 # Appendix
 
+## Distribution Plots
+
+Figure \@ref(fig:employmentkde) shows the probability density estimates for employment measures. Employment measures are the employment rate, the proportion of population that are unemployed, and the proportion of population that are pensioners. The distributions show that ...
+
+Figure \@ref(fig:sectorkde) shows the probability density estimates for the weights of economic sectors in the municipalities. Sectors are the primary-, secondary-, and services sectors. We can interpret that ...
+
+
+```{r employmentkde, echo=FALSE, fig.cap='Probability density estimates for employment related measures',fig.align='left', out.width='80%', optipng = '-o7'}
+
+ggplot(employment, aes(x=value, fill=variable)) + geom_density(alpha = .25, adjust = .75) + theme_light() +
+  scale_fill_manual( values = c("#dde318","#3dbc74","#440154")) +
+  labs(x = "Percentage (%) of Population", y = "Density", fill = "Variable", title = "Employment Measures") +
+  theme(legend.position = "right", legend.text = element_text(size = 9))
+
+```
+
+
+```{r sectorkde, echo=FALSE, fig.cap='Probability density estimates for economic sectors', fig.align='left', out.width='80%', optipng = '-o7'}
+
+ggplot(sectors, aes(x=value, fill=variable)) + geom_density(alpha = .25, adjust = .75) + theme_light() +
+  scale_fill_manual( values = c("#dde318","#3dbc74","#440154")) +
+  labs(x = "Percentage (%) of Population", y = "Density", fill = "Variable", title = "Economic Sectors") +
+  theme(legend.position = "right", legend.text = element_text(size = 9))
+
+```
+
+
 Figure \@ref(fig:scoreplot2) shows the scores for PCs 3 and 4.
 
 Figure \@ref(fig:loadingsplot2) shows the loading directions for PCs 3 and 4.
 
 ## Principal Components 3 and 4
 
-```{r scoreplot2, warning=FALSE, echo=FALSE, message=FALSE, fig.cap="Score plot for all municipalities that have a top 5 absolute loading for any of PC3 and PC4", fig.align='left', optipng = '-o7'}
+```{r scoreplot2, warning=FALSE, echo=FALSE, message=FALSE, fig.cap="Score plot for all municipalities that have a top 5 absolute loading for any of PC3 and PC4", fig.align='left', optipng = '-o7', fig.dim=c(6,4)}
 
 loads <- muni.pca$x[, 3:4] %>% as.data.frame() %>% rownames_to_column() %>% as_tibble() %>% dplyr::rename(Area = rowname)
 
@@ -524,15 +529,15 @@ loads.reduced <- full_join(greatest5.PC3, smallest5.PC3) %>% full_join(greatest5
 ggplot(loads.reduced, aes(x = PC3, y = PC4, label = Area)) +
   geom_point() +
   geom_text_repel(size = 3) +
-  xlim(c(-5,5)) +
+  xlim(c(-4,5)) +
   ylim(c(-8,8)) +
-  ggtitle("PCA Scores, 3rd and 4th PC") +
+  ggtitle("PCA Scores") +
   theme_light()
 
 ```
 
 
-```{r loadingsplot2, warning=FALSE, echo=FALSE, message=FALSE, fig.cap="Loading directions for PC3 and PC4", fig.align='left', optipng = '-o7'}
+```{r loadingsplot2, warning=FALSE, echo=FALSE, message=FALSE, fig.cap="Loading directions for PC3 and PC4", fig.align='left', optipng = '-o7', fig.dim=c(6,4)}
 
 ggplot2::autoplot(muni.pca,
                   x = 3,
@@ -548,7 +553,7 @@ ggplot2::autoplot(muni.pca,
   scale_y_continuous(limits = c(-0.3, 0.3)) +
   labs(x = "Standardized PC3 (10.2% explained var.)",
        y = "Standardized PC4 (7.2% explained var.)",
-       title = "PCA Loadings, 3rd and 4th PC") +
+       title = "PCA Loading Directions") +
   theme_light()
 
 ```
