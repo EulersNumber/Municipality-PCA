@@ -7,7 +7,6 @@ output:
     keep_tex: false
     number_sections: true
     fig_caption: true
-    citation_package: natbib
 bibliography: references.bib
 header-includes:
 - \pagenumbering{gobble}
@@ -93,13 +92,6 @@ muni.latest <- muni.latest %>%
 
 ```
 
-<!-- \vspace{-1cm} -->
-
-<!-- \tableofcontents -->
-
-<!-- \listoftables -->
-<!-- \listoffigures -->
-
 \newpage
 \pagenumbering{arabic}
 
@@ -115,7 +107,7 @@ We concentrate on municipalities only, so we filtered out the country (koko maa)
 
 ## Research Question and Motivation 
 
-The purpose of this study is to reduce dimensionality in the data and assess whether differences between the municipalities can be explained by considerably less than 32 dimensions - namely by first few principal components (PCs). This study's contribution can be seen as exploratory data analysis where the municipalities are clustered in a lower dimension. The results can be applied in further work in e.g., more advanced clustering, prediction or economic decision making. 
+The purpose of this study is to reduce dimensionality in the data and assess whether differences between the municipalities can be explained by considerably less than 32 dimensions - namely by first few principal components. This study's contribution can be seen as exploratory data analysis where the municipalities are clustered in a lower dimension. The results can be applied in further work in e.g., more advanced clustering, prediction or economic decision making. 
 
 Clustering municipalities with demographic factors can be useful in a business context, e.g., marketing. Knowing how municipalities differ in demographics can help a company to improve its targeting and e.g., launch different marketing campaigns or product lines in different municipalities.
 
@@ -361,16 +353,16 @@ ggcorrplot(corr, hc.order = TRUE, type = "full", lab = TRUE, title = "Heatmap of
 
 ```
 
-# Principal Component Analysis (PCA)
+# Principal Component Analysis
 
 ## Motivation
 
-PCA is a technique that is used for reducing dimensionality in numeric data while preserving as much as possible of the information (i.e., variation) contained in the original data. As our variables were numeric, and the main objective was to reduce dimensionality in the data, PCA was the best choice. Moreover, we had a prior belief or hypothesis that differences in municipalities could arguably be explained in quite simple terms like center of growth or pensioner municipality, so PCA seemed like an interesting tool to test the hypothesis.  
+Principal Component Analysis (PCA) is a technique that is used for reducing dimensionality in numeric data while preserving as much as possible of the information (i.e., variation) contained in the original data. As our variables were numeric, and the main objective was to reduce dimensionality in the data, PCA was the best choice. Moreover, we had a prior belief or hypothesis that differences in municipalities could arguably be explained in quite simple terms like center of growth or pensioner municipality, so PCA seemed like an interesting tool to test the hypothesis.  
 
 
 ## Scree Plot
 
-Figure \@ref(fig:screeplot) shows what proportion of variance is explained by each PC along with the cumulative proportion of variance explained up to that PC. The scree plot shows that we can explain close to 55% of all variation using only the first two PCs. Furthermore, close to 70% of the variation can be explained by using the first four PCs. In this report, we do further analysis with these four PCs. We have indicated those PCs in the plot with a green color.  
+Figure \@ref(fig:screeplot) shows what proportion of variance is explained by each principal component (PC) along with the cumulative proportion of variance explained up to that PC. The scree plot shows that we can explain close to 55% of all variation using only the first two PCs. Furthermore, close to 70% of the variation can be explained by using the first four PCs. In this report, we do further analysis using these four PCs and have indicated them in the plot with a green color.
 
 ```{r screeplot, echo=FALSE, fig.cap="Variance explained by each Princial Component (PC) up to the 20th PC. The bars represent proportion of variance explained and the line with data points indicates the cumulative proportion of variance explained up to that PC. This type of a plot is also known as a Scree Plot.", fig.align='left', optipng = '-o7'}
 
@@ -464,9 +456,14 @@ Corresponding figures for PC3 and PC4 are shown in the Appendix.
 
 # Discussion and Conclusions
 
-In this report, we have used PCA to reduce dimensionality in demographic data of Finnish Municipalities provided by Tilastokeskus. The results indicate that although Finland has very heterogeneous municipalities, some conclusions can be made after projecting the data in the principal component space. PC1 explains 31.7% of the variance and can be seen as an index of youthfulness of a municipality. PC2 explains 20.5% of the variance and can be interpreted as an index of economic prosperity of a municipality. By plotting the PC1 and PC2 scores for only those municipalities that have a top 5 absolute loading for any of the two components resulted in four clear clusters of municipalities, which demonstates that the objective of the study was accomplished.
+In this report, we have used PCA to reduce dimensionality in demographic data of Finnish Municipalities provided by Tilastokeskus. The results indicate that although Finland has very heterogeneous municipalities, some conclusions can be made after projecting the data in the principal component space. PC1 explains 31.7% of the variance and can be seen as an index of youthfulness of a municipality. PC2 explains 20.5% of the variance and can be interpreted as an index of economic prosperity of a municipality. By plotting the PC1 and PC2 scores for only those municipalities that have a top 5 absolute loading for any of the two components resulted in four clear clusters of municipalities, which demonstrates that the objective of the study was accomplished.
 
-Limitations of this study can be seen as the following. First, PC1 and PC2 do not explain a high percentage of the variance (above 80%). Hence, PCA might not be a suitable method to draw conclusions from. Second, using population, employed persons and some other absolute measures might have alienated Helsinki from the other cities and biased the analysis a bit. Perhaps leaving out Helsinki would have been a wise choice. Third, highly correlated variables could have been reduced to only one. In other words, perhaps it would have been wise to remove unnecessary variables. Further research on this topic could address these potential shortcomings or use the findings of the report for more advanced or continued work.
+Limitations of this study can be seen as the following. First, PC1 and PC2 do not explain a very high (above 80%) percentage of the variance. Hence, PCA might not be a suitable method to draw conclusions from with this data. Second, using population, employed and some other variables measured in absolute numbers might have alienated Helsinki from the other cities and biased the analysis a bit regardless of standardization. Perhaps leaving out Helsinki would have been a better option. Third, highly correlated variables could perhaps have been reduced to only one. In other words, perhaps it we could have removed unnecessary variables. Lastly, according to public authorities [@munis], Finland should have 309 municipalities. However, I have 314 in my data after cleaning. Hence, there is a possibility that I have included some municipalities that should not have been categorized as municipalities. Further work on this topic could address these potential shortcomings.
+
+\newpage
+# References
+
+<div id="refs"></div>
 
 \newpage
 # Appendix
@@ -557,9 +554,5 @@ ggplot2::autoplot(muni.pca,
   theme_light()
 
 ```
-
-\newpage
-# References
-
 
 
