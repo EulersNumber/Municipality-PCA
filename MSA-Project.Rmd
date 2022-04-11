@@ -99,23 +99,23 @@ muni.latest <- muni.latest %>%
 
 ## Data Collection and Cleaning
 
-Tilastokeskus provides data on 32 demographic variables of Finnish municipalities. The data can be freely obtained from Tilastokeskus' website in csv. format [@data]. 
+Tilastokeskus provides data on 32 demographic variables Finnish municipalities. The data can be freely obtained from Tilastokeskus' website in csv. format [@data]. 
 
-The variables provide information on e.g., the municipalities' population and its growth, age structure, economic sector structure, and the split between different housing types.
+The variables provide information on e.g., the municipalities' population and its growth, age structure, economic sector split, and housing type split.
 
-We concentrate on municipalities only, so we filtered out the country (koko maa), all counties (maakunta) and subregions (seutukunta) from the data. Moreover, we removed Mariehamn Stad as it contains the same information as Maarianhamina.
+We concentrate on municipalities only, so we filtered out the country (koko maa), counties (maakunta) and subregions (seutukunta) from the data. Moreover, we removed Mariehamn Stad as it contains the same information as Maarianhamina. The final data contains 314 municipalities or equivalently, observations, as we have a cross-sectional data of statistics for one year.
 
 ## Research Question and Motivation 
 
-The purpose of this study is to reduce dimensionality in the data and assess whether differences between the municipalities can be explained by considerably less than 32 dimensions - namely by first few principal components. This study's contribution can be seen as exploratory data analysis where the municipalities are clustered in a lower dimension. The results can be applied in further work in e.g., more advanced clustering, prediction or economic decision making. 
+The purpose of this study is to reduce dimensionality in the data and assess whether differences between the municipalities can be explained by considerably less than 32 dimensions - namely by the first few principal components. This study's contribution can be seen as exploratory data analysis where the municipalities are clustered in a lower dimension. The results can be applied in a virtue of further work. Examples are more advanced clustering, predictive modelling or gathering contextual knowledge for economic decision making.
 
-Clustering municipalities with demographic factors can be useful in a business context, e.g., marketing. Knowing how municipalities differ in demographics can help a company to improve its targeting and e.g., launch different marketing campaigns or product lines in different municipalities.
+Clustering municipalities with demographic factors can be useful in a business context as well, e.g., marketing. Knowing how municipalities differ in demographics can help a company to improve its targeting. For instance, they could launch different marketing campaigns or product lines in different municipalities.
 
 # Univariate Analysis
 
 ## Variable Descriptions
 
-Table \@ref(tab:vardesc) describes the variables used in this study. We can see that most of the variables are measured in 2020 and represent a proportion of a municipality's population. Some variables, e.g., Population, have newer data (2021) while a some data points to 2019 (e.g., split of economic sectors). Overall, we have a quite wide demographic spectrum as the variables cover many aspects of the municipalities' nature: population and migration trends, education level and housing, employment, ethnicity, economy, etc. 
+Table \@ref(tab:vardesc) describes all the variables used in this study. More detailed descriptions are available at Tilastokeskus' website [@data]. We can see from the Table that most of the variables are measured in 2020 and represent a proportion of a municipality's population. Some variables, e.g., Population, are newer data (2021) while a some data points are from 2019 (e.g., split of economic sectors). Overall, we have a quite wide demographic spectrum as the variables cover many aspects of the municipalities: population and migration trends, education level and housing, employment, ethnicity, economy, and so on.
 
 ```{r vardesc, echo=FALSE}
 
@@ -261,13 +261,13 @@ kable(var.df, format = "latex", align = "lll", col.names = c("Variable", "Origin
 
 ## Descriptive Statistics
 
-Table \@ref(tab:descstats) shows descriptive statistics for each variable in the data. We can see that many of the variables have quite large variance. This is somewhat expected as the data is a cross-section of 314 Finnish municipalities, so we have very different types of municipalities in the data.
+Table \@ref(tab:descstats) shows descriptive statistics for all variables in the data. We can see that many of the variables have quite large variance. This is somewhat expected as the data is a cross-section of 314 Finnish municipalities, so we have very different types of municipalities in the data.
 
-The heterogeneity of the data can be seen from e.g., the population variable, where we have a minimum of 105 inhabitants (Sottunga) and a maximum of 658457 inhabitants (Helsinki). The median population is 6134 and the 3rd quartile is 15145, so it is clear that Finland is a country with mostly small municipalities but a few huge ones.
+The heterogeneity of the data can be seen from e.g., the population variable, where we have a minimum of 105 inhabitants (Sottunga) and a maximum of 658457 inhabitants (Helsinki). The median population is 6134 and the 3rd quartile is 15145, so it is clear that Finland is a country with mostly small municipalities but a few very large ones.
 
-An interesting observation is also that in some municipalities, only 20.1% work locally inside their own municipality (Kauniainen), while in other the share is as large as 91.7% (Kuusamo). Moreover, in some municipalities, over a fifth is unemployed (21.6% in Ilomantsi) while in other places, the unemployment rate is as low as 3.7% (Föglö).
+An interesting observation is that in some municipalities, only 20.1% work locally inside their own municipality (Kauniainen), while in others the share is as large as 91.7% (Kuusamo). Moreover, in some municipalities, over a fifth is unemployed (21.6% in Ilomantsi) while in other places, the unemployment rate is as low as 3.7% (Föglö).
 
-It is also clear that Finland is a country where in some municipalities, people mostly speak Swedish (92.4% in Sottunga) while in many other, not even a permille speak Swedish (from relatively big municipalities, e.g., Iisalmi). Furthermore, in Sottunga, over a forth (25.7%) are foreign citizens while in Merijärvi, foreign citizens only comprise 0.3% of the population.
+It is also evident that Finland is a country where in some municipalities, people mostly speak Swedish (92.4% in Sottunga) while in many other, not even a permille speak Swedish (from relatively big municipalities, e.g., Iisalmi). Furthermore, in Sottunga, over a forth (25.7%) are foreign citizens while in Merijärvi, foreign citizens only comprise 0.3% of the population. There are most likely many Swedish people living in Sottunga since it is located in Åland.
 
 ```{r descstats, echo=FALSE}
 stats <- muni.latest[, -1] %>% apply(2, summary) %>% t() %>% as.data.frame()
@@ -306,15 +306,11 @@ sectors <- melt(sectors)
 ```
 
 
-To analyze how variables are distributed, we use Kernel density estimation to estimate the probability densities for variables in some common groups. 
+To analyze further how the variables are distributed, we use Kernel density estimation to estimate the probability densities for variables in some common groups and visualize the results. 
 
 Figure \@ref(fig:agekde) shows the probability density estimates for age groups. Age groups are shares of population aged below 15, 15 to 64, and over 64. We can see that Prop.Over64  has a wide distribution. The median is close to 30% but there are municipalities in both ends of the distribution. The distribution of Prop.Under15 has a lower variance around its mean value of ~15% but the distribution is clearly positively skewed as there are some municipalities with over 30% of below 15 year-old citizens (Liminka; 30.8%).
 
-Figure \@ref(fig:housingkde) shows the probability density estimates for housing types. Housing types are shares of population living in either terraced or detached houses and in rental apartments. The Figure characterizes Finland well - the distribution of Prop.Households.Terr.Det show that there are lots of municipalities where ~9/10 citizens tend to live in terraced or detached houses. However, the distribution is highly negatively skewed so there are some municipalities where very few people live in those types of houses. On the other hand, Prop.Households.Rental is centered around ~20% but highly positively skewed. This means that while in average 1/5 of people live on rent, there are municipalities where more than half are living on rent. Overall, these results support to hypothesis that Finland is a country of many rural municipalities where people tend to live in terraced and detached houses, and a few big municipalities where the proportion of rental housing increases with city size and the degree of urbanization.
-
-Similar distribution plots for employment measures and economic sectors are shown in the Appendix.
-
-```{r agekde, echo=FALSE, fig.cap='Probability density estimates for age groups', fig.align='left', out.width='80%', optipng = '-o7'}
+```{r agekde, echo=FALSE, fig.cap='Probability density estimates for age groups', fig.align='left', out.width='65%', optipng = '-o7'}
 
 ggplot(ages, aes(x=value, fill=variable)) + geom_density(alpha = .25, adjust = .75) + theme_light() +
   scale_fill_manual( values = c("#dde318","#3dbc74","#440154")) +
@@ -323,8 +319,9 @@ ggplot(ages, aes(x=value, fill=variable)) + geom_density(alpha = .25, adjust = .
 
 ```
 
+Figure \@ref(fig:housingkde) shows the probability density estimates for housing types. Housing types are shares of population living in either terraced or detached houses and in rental apartments. The Figure characterizes Finland well - the distribution of Prop.Households.Terr.Det show that there are lots of municipalities where ~9/10 citizens tend to live in terraced or detached houses. However, the distribution is highly negatively skewed so there are some municipalities where very few people live in those types of houses. On the other hand, Prop.Households.Rental is centered around ~20% but highly positively skewed. This means that while in average 1/5 of people live on rent, there are municipalities where more than half are living on rent. Overall, these results support to hypothesis that Finland is a country with many rural municipalities where people tend to live in terraced and detached houses, and a few big municipalities where the proportion of rental housing increases with city size and the degree of urbanization.
 
-```{r housingkde, echo=FALSE, fig.cap='Probability density estimates for housing types', fig.align='left', out.width='80%', optipng = '-o7'}
+```{r housingkde, echo=FALSE, fig.cap='Probability density estimates for housing types', fig.align='left', out.width='70%', optipng = '-o7'}
 
 ggplot(living, aes(x=value, fill=variable)) + geom_density(alpha = .25, adjust = .75) + theme_light() +
   scale_fill_manual( values = c("#dde318","#3dbc74","#440154")) +
@@ -332,6 +329,29 @@ ggplot(living, aes(x=value, fill=variable)) + geom_density(alpha = .25, adjust =
   theme(legend.position = "right", legend.text = element_text(size = 9))
 
 ```
+
+Figure \@ref(fig:employmentkde) shows the probability density estimates for employment measures. Employment measures are the employment rate, the proportion of population that are unemployed, and the proportion of population that are pensioners. The Figure shows that Prop.Unempl has a considerable lower variance than Prop.Pensioners. This means while municipalities may have very different age structures, unemployment does not vary as much. This is somewhat expected in a welfare state like Finland. Empl.Rate is centered around 70% quite symmetrically with a standard deviation of ~5%, which shows that municipalities have some differences in employment rates (e.g., Outokumpu 58.3% vs. Luoto 82.4%). 
+
+```{r employmentkde, echo=FALSE, fig.cap='Probability density estimates for employment related measures',fig.align='left', out.width='70%', optipng = '-o7'}
+
+ggplot(employment, aes(x=value, fill=variable)) + geom_density(alpha = .25, adjust = .75) + theme_light() +
+  scale_fill_manual( values = c("#dde318","#3dbc74","#440154")) +
+  labs(x = "Percentage (%) of Population", y = "Density", fill = "Variable", title = "Employment Measures") +
+  theme(legend.position = "right", legend.text = element_text(size = 9))
+
+```
+
+Figure \@ref(fig:sectorkde) shows the probability density estimates for the weights of economic sectors in the municipalities. Sectors are the primary-, secondary-, and services sectors. We can interpret that municipalities have large variance in the split between economic sectors. For example, in Kauniainen, the proportion of services is 93.1% while it is only 23.6% in Pyhäntä. Pyhäntä is the most secondary sector -concentrated municipality in Finland with a weight of 67% in secondary production. Lestijärvi is the most primary sector -focused municipality in Finland with a weight of 36.5% in primary production.
+
+```{r sectorkde, echo=FALSE, fig.cap='Probability density estimates for economic sectors', fig.align='left', out.width='70%', optipng = '-o7'}
+
+ggplot(sectors, aes(x=value, fill=variable)) + geom_density(alpha = .25, adjust = .75) + theme_light() +
+  scale_fill_manual( values = c("#dde318","#3dbc74","#440154")) +
+  labs(x = "Percentage (%) of Population", y = "Density", fill = "Variable", title = "Economic Sectors") +
+  theme(legend.position = "right", legend.text = element_text(size = 9))
+
+```
+
 
 # Bivariate Analysis
 
@@ -345,7 +365,7 @@ Another cluster of strong positive correlations is in the bottom left corner of 
 
 There are also variables with strong negatively correlations. In the bottom right corner, we see that Prop.15to64 is negatively associated with Soc.Health.Activity, Depend.Ratio, Prop.Pensioners, and Prop.Over64. This means that in contrast to municipalities with old people, municipalities with many 15 to 64 year-olds tend to spend less on social and health activities. The same applies to the variable Prop.Below15.
 
-Interesting observations include the correlations between Prop.Households.Terr.Det and Prop.Primary.Sector, Education (Prop.Educ.Degree2 & Prop.Educ.Degree3) and Deg.Urbanisation, and Prop.Households.Rental and a handful of variables (Jobs.Muni, Labour.Force, Households, Popul, and Families). First, it seems that people tend to live in terraced or detached houses in municipalities that are driven by the primary sector. Second, education appears to be associated with high levels of urbanisation. This is most likely due to the fact that high schools, universities, and high-profile jobs (where highly educated people work) tend to locate in bigger cities that are urbanising the fastest. Lastly, rental housing tends to be linked with jobs, population size, and households. This could be due to the fact that rental housing is more common in big cities, where there tend to be relatively more young people and apartments are more costly.
+Additional interesting observations include the correlations between Prop.Households.Terr.Det and Prop.Primary.Sector, Education (Prop.Educ.Degree2 & Prop.Educ.Degree3) and Deg.Urbanisation, and Prop.Households.Rental and a handful of variables (Jobs.Muni, Labour.Force, Households, Popul, and Families). First, it seems that people tend to live in terraced or detached houses in municipalities that are driven by the primary sector. Second, education appears to be associated with high levels of urbanisation. This is most likely due to the fact that high schools, universities, and high-profile jobs (where highly educated people work) tend to locate in bigger cities that are urbanising the fastest. Lastly, rental housing tends to be linked with jobs, population size, and households. This could be due to the fact that rental housing is more common in big cities, where there tend to be relatively more young people and apartments are more costly.
 
 ```{r corrplot, echo=FALSE, fig.dim=c(18,18), fig.cap="Heatmap of Pearson'n correlation between all variables. Red color indicates stron positive correlation while blue color indicates strong negative correlation. White color indicates no correlation.", optipng = '-o7'}
 corr <- cor(muni.latest[, -1])
@@ -357,7 +377,7 @@ ggcorrplot(corr, hc.order = TRUE, type = "full", lab = TRUE, title = "Heatmap of
 
 ## Motivation
 
-Principal Component Analysis (PCA) is a technique that is used for reducing dimensionality in numeric data while preserving as much as possible of the information (i.e., variation) contained in the original data. As our variables were numeric, and the main objective was to reduce dimensionality in the data, PCA was the best choice. Moreover, we had a prior belief or hypothesis that differences in municipalities could arguably be explained in quite simple terms like center of growth or pensioner municipality, so PCA seemed like an interesting tool to test the hypothesis.  
+Principal Component Analysis (PCA) is a technique that is used for reducing dimensionality in numeric data while preserving as much as possible of the information (i.e., variation) contained in the original data. As our variables were numeric, and the main objective was to reduce dimensionality in the data, PCA was seen as the multivariate method. Moreover, we had a prior belief or hypothesis that differences in municipalities could arguably be explained in quite simple terms like center of growth or pensioner municipality, so PCA seemed like an interesting tool to test this hypothesis.  
 
 
 ## Scree Plot
@@ -392,15 +412,10 @@ ggplot(scree.df) +
 
 ## Principal Components 1 and 2
 
-Figure \@ref(fig:scoreplot1) shows the scores for PCs 1 and 2 for all municipalities that have a top. We can clearly see four clusters of municipalities. The first cluster comprises only of Helsinki - Finland's capital city. The second cluster comprises of Espoo, Vantaa, Tampere, Oulu, and Turku - large cities around Finland. The third cluster comprises of Jomala, Lemland, Luoto, Lumparland, and Saltvik - small Swedish speaking municipalities in rural areas. The forth cluster comprises of Puolanka, Hyrynsalmi, Posio, Rautavaara, and Rääkkylä - small pensioner municipalities in rural areas.
+Figure \@ref(fig:scoreplot1) shows the scores for PC1 and PC2 for all municipalities that have a top 5 absolute loading for any of PC1 or PC2. We can clearly see four clusters of municipalities. The first cluster comprises only of Helsinki - Finland's capital city. The second cluster comprises of Espoo, Vantaa, Tampere, Oulu, and Turku - large urbanized cities around Finland. The third cluster comprises of Jomala, Lemland, Luoto, Lumparland, and Saltvik - small Swedish speaking municipalities in rural areas. The forth cluster comprises of Puolanka, Hyrynsalmi, Posio, Rautavaara, and Rääkkylä - small Finnish speaking pensioner municipalities in rural areas.
 
-For a deeper characterisation of the revealed clusters, we must look at the loading directions plot, which shows what loadings the different variables have for PCs 1 and 2. Figure \@ref(fig:loadingsplot1) shows the corresponding plot. 
 
-We can see that variables that have the most negative loading for PC1 are Prop.15to64, Prop.Educ.Degree3, Families, and Popul while Prop.Pensioners, Prop.Over64, Depend.Ratio, Soc.Health.Activity have strongest positive loadings. This means that PC1 can be interpreted as an index of youthfulness of a municipality - youthful municipalities are highly populated with young, educated working people and families while old municipalities are filled with pensioners.
-
-Considering the PC2 dimension, we see that most negatively loaded variables are Prop.Households.Rental, Prop.Empl.Muni, Prop.Unempl, and Jobs.Self.Suff while Empl.Rate, Prop.Households.Terr.Det, Prop.Under15, and Prop.Swedish have strongest positive loadings. PC2 is more difficult to interpret but a clear sign is that Swedish speaking municipalities load positively for PC2. Living on a rent and unemployment indicate lower economic prosperity than living in a terraced or detached house or employment. Perhaps a high number of children is also a sign of economic wellbeing, since having children can be expensive these days. Therefore, PC2 could be an index of economic prosperity. Big cities have a lot of smaller aparments for rent and many younger people like students live there, which could explain why these cities score quite low in PC2 dimension in comparison to smaller cities.
-
-```{r scoreplot1, warning=FALSE, echo=FALSE, message=FALSE, fig.cap="Score plot for all municipalities that have a top 5 absolute loading for any of PC1 and PC2", fig.align='left', optipng = '-o7', fig.dim=c(6,4)}
+```{r scoreplot1, warning=FALSE, echo=FALSE, message=FALSE, fig.cap="Score plot for all municipalities that have a top 5 absolute loading for any of PC1 or PC2", fig.align='left', optipng = '-o7', fig.dim=c(6,4)}
 
 loads <- muni.pca$x[, 1:2] %>% as.data.frame() %>% rownames_to_column() %>% as_tibble() %>% dplyr::rename(Area = rowname)
 
@@ -432,6 +447,7 @@ ggplot(loads.reduced, aes(x = PC1, y = PC2, label = Area)) +
 
 ```
 
+For a deeper characterisation of the revealed clusters, we should look at the loading directions plot, which shows what loadings the different variables have for PCs 1 and 2. Figure \@ref(fig:loadingsplot1) shows the corresponding plot. 
 
 ```{r loadingsplot1, warning=FALSE, echo=FALSE, message=FALSE, fig.cap="Loading directions for PC1 and PC2", fig.align='left', optipng = '-o7', fig.dim=c(6,4)}
 
@@ -452,13 +468,17 @@ ggplot2::autoplot(muni.pca,
 
 ```
 
-Corresponding figures for PC3 and PC4 are shown in the Appendix. 
+We can see that variables that have the most negative loading for PC1 are Prop.15to64, Prop.Educ.Degree3, Families, and Popul while Prop.Pensioners, Prop.Over64, Depend.Ratio, Soc.Health.Activity have strongest positive loadings. This means that PC1 could be interpreted as an index of youthfulness of a municipality - youthful municipalities are highly populated with young, educated working people and families while old municipalities are filled with pensioners.
+
+Considering the PC2 dimension, we see that most negatively loaded variables are Prop.Households.Rental, Prop.Empl.Muni, Prop.Unempl, and Jobs.Self.Suff while Empl.Rate, Prop.Households.Terr.Det, Prop.Under15, and Prop.Swedish have strongest positive loadings. PC2 is more difficult to interpret but a clear sign is that Swedish speaking municipalities load positively for PC2. Living on a rent and unemployment indicate lower economic prosperity than living in a terraced or detached house or employment. Perhaps a high number of children is also a sign of economic wellbeing, since having children can be expensive these days. Therefore, PC2 could be an index of economic prosperity. Big cities have a lot of smaller aparments for rent and many younger people like students live there, which could explain why these cities score quite low in PC2 dimension in comparison to smaller cities.
+
+Score and loading direction plots for PC3 and PC4 are shown in the Appendix but the interpretations are left for the interested due to scope of the study.
 
 # Discussion and Conclusions
 
-In this report, we have used PCA to reduce dimensionality in demographic data of Finnish Municipalities provided by Tilastokeskus. The results indicate that although Finland has very heterogeneous municipalities, some conclusions can be made after projecting the data in the principal component space. PC1 explains 31.7% of the variance and can be seen as an index of youthfulness of a municipality. PC2 explains 20.5% of the variance and can be interpreted as an index of economic prosperity of a municipality. By plotting the PC1 and PC2 scores for only those municipalities that have a top 5 absolute loading for any of the two components resulted in four clear clusters of municipalities, which demonstrates that the objective of the study was accomplished.
+In this report, we have used PCA to reduce dimensionality in demographic data of Finnish Municipalities provided by Tilastokeskus. The results indicate that although Finland has very heterogeneous municipalities, some conclusions can be made after projecting the data in the principal component space. PC1 explains 31.7% of the variance and can be seen as an index of youthfulness of a municipality. PC2 explains 20.5% of the variance and can be interpreted as an index of economic prosperity of a municipality. Plotting the PC1 and PC2 scores for only those municipalities that have a top 5 absolute loading for any of the two components resulted in four clear clusters of municipalities, which demonstrates that the objective of the study was accomplished.
 
-Limitations of this study can be seen as the following. First, PC1 and PC2 do not explain a very high (above 80%) percentage of the variance. Hence, PCA might not be a suitable method to draw conclusions from with this data. Second, using population, employed and some other variables measured in absolute numbers might have alienated Helsinki from the other cities and biased the analysis a bit regardless of standardization. Perhaps leaving out Helsinki would have been a better option. Third, highly correlated variables could perhaps have been reduced to only one. In other words, perhaps it we could have removed unnecessary variables. Lastly, according to public authorities [@munis], Finland should have 309 municipalities. However, I have 314 in my data after cleaning. Hence, there is a possibility that I have included some municipalities that should not have been categorized as municipalities. Further work on this topic could address these potential shortcomings.
+Limitations of this study can be seen as the following. First, PC1 and PC2 do not explain a very high (above 80%) percentage of the variance. Hence, PCA might not be a suitable method to draw conclusions from with this data. Second, using population, employed and some other variables measured in absolute numbers might have alienated Helsinki from the other cities and biased the analysis a bit regardless of standardization of variables. Perhaps leaving out Helsinki would have been a better option. Third, highly correlated variables could perhaps have been reduced to only one. In other words, perhaps we could have removed unnecessary variables. Lastly, according to public authorities [@munis], Finland should have 309 municipalities. However, I have 314 in my data after cleaning. Hence, there is a possibility that I have included some municipalities that should not have been categorized as municipalities. Any further work on this topic is encouraged to address these potential shortcomings.
 
 \newpage
 # References
@@ -468,40 +488,11 @@ Limitations of this study can be seen as the following. First, PC1 and PC2 do no
 \newpage
 # Appendix
 
-## Distribution Plots
-
-Figure \@ref(fig:employmentkde) shows the probability density estimates for employment measures. Employment measures are the employment rate, the proportion of population that are unemployed, and the proportion of population that are pensioners. The distributions show that ...
-
-Figure \@ref(fig:sectorkde) shows the probability density estimates for the weights of economic sectors in the municipalities. Sectors are the primary-, secondary-, and services sectors. We can interpret that ...
-
-
-```{r employmentkde, echo=FALSE, fig.cap='Probability density estimates for employment related measures',fig.align='left', out.width='80%', optipng = '-o7'}
-
-ggplot(employment, aes(x=value, fill=variable)) + geom_density(alpha = .25, adjust = .75) + theme_light() +
-  scale_fill_manual( values = c("#dde318","#3dbc74","#440154")) +
-  labs(x = "Percentage (%) of Population", y = "Density", fill = "Variable", title = "Employment Measures") +
-  theme(legend.position = "right", legend.text = element_text(size = 9))
-
-```
-
-
-```{r sectorkde, echo=FALSE, fig.cap='Probability density estimates for economic sectors', fig.align='left', out.width='80%', optipng = '-o7'}
-
-ggplot(sectors, aes(x=value, fill=variable)) + geom_density(alpha = .25, adjust = .75) + theme_light() +
-  scale_fill_manual( values = c("#dde318","#3dbc74","#440154")) +
-  labs(x = "Percentage (%) of Population", y = "Density", fill = "Variable", title = "Economic Sectors") +
-  theme(legend.position = "right", legend.text = element_text(size = 9))
-
-```
-
-
-Figure \@ref(fig:scoreplot2) shows the scores for PCs 3 and 4.
-
-Figure \@ref(fig:loadingsplot2) shows the loading directions for PCs 3 and 4.
-
 ## Principal Components 3 and 4
 
-```{r scoreplot2, warning=FALSE, echo=FALSE, message=FALSE, fig.cap="Score plot for all municipalities that have a top 5 absolute loading for any of PC3 and PC4", fig.align='left', optipng = '-o7', fig.dim=c(6,4)}
+Figure \@ref(fig:scoreplot2) shows the scores for PC3 and PC4.
+
+```{r scoreplot2, warning=FALSE, echo=FALSE, message=FALSE, fig.cap="Score plot for all municipalities that have a top 5 absolute loading for any of PC3 or PC4", fig.align='left', optipng = '-o7', fig.dim=c(5.5,3.5)}
 
 loads <- muni.pca$x[, 3:4] %>% as.data.frame() %>% rownames_to_column() %>% as_tibble() %>% dplyr::rename(Area = rowname)
 
@@ -533,8 +524,9 @@ ggplot(loads.reduced, aes(x = PC3, y = PC4, label = Area)) +
 
 ```
 
+Figure \@ref(fig:loadingsplot2) shows the loading directions for PC3 and PC4.
 
-```{r loadingsplot2, warning=FALSE, echo=FALSE, message=FALSE, fig.cap="Loading directions for PC3 and PC4", fig.align='left', optipng = '-o7', fig.dim=c(6,4)}
+```{r loadingsplot2, warning=FALSE, echo=FALSE, message=FALSE, fig.cap="Loading directions for PC3 and PC4", fig.align='left', optipng = '-o7', fig.dim=c(5.5,3.5)}
 
 ggplot2::autoplot(muni.pca,
                   x = 3,
