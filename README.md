@@ -1,3 +1,3 @@
 # MSA Project
 
-Course project in Multivariate Statistical Analysis
+Segmentation of Finnish municipalities with Principal Component Analysis
